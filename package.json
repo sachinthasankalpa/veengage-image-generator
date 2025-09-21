@@ -1,0 +1,13 @@
+{
+  "name": "veengage-image-generator",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "yarn workspace api dev",
+    "dev:frontend": "yarn workspace frontend dev",
+    "test:api": "yarn workspace api test"
+  }
+}
