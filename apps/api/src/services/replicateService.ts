@@ -6,6 +6,22 @@ const replicate = new Replicate({
   auth: config.replicateApiKey,
 });
 
+const STYLE_PROMPTS: Record<string, string> = {
+  auto: 'A simple 3D icon with a smooth, matte, clay-like finish. Features soft, diffuse lighting and subtle highlights to create depth. Toy-like and clean, with a modern aesthetic and gentle ambient occlusion. No hard edges or photo textures.',
+  sticker:
+    'A die-cut sticker illustration on a light grey neutral background. Features a bold, cartoonish design with thick colored outlines and vibrant, saturated fills. The sticker is encased by a thick, uniform white border that clearly separates it from the background. A soft but distinct drop shadow beneath the sticker gives it a 3D "peeling off" look. Glossy highlights suggest a vinyl finish. The background must not be pure white, so the white sticker border is always visible.',
+  pastels:
+    'A flat illustration using a soft, muted pastel color palette (e.g., lavender, baby blue, soft pink). Features clean, colored linework that is slightly darker than the fills. The design is simple and airy, with a gentle, low-contrast aesthetic. Minimal to no shading, focusing on flat color shapes.',
+  business:
+    'A flat design business icon in minimalist style. A simple white silhouette placed inside a solid circular background. The silhouette is bold, geometric, and highly legible, with no outlines, no gradients, no shadows, and no extra details. Only two colors: white for the icon, and a single solid color for the circle background.',
+  cartoon:
+    "A cute and charming cartoon illustration in a children's book style. Features a soft, textured feel, resembling watercolor or digital pastels on paper. Uses warm, friendly colors and gentle gradients. The character has a simple, happy facial expression with blushing cheeks. Soft, colored outlines instead of harsh black lines.",
+  '3d model':
+    'A simple 3D icon with a smooth, matte, clay-like finish. Features soft, diffuse lighting and subtle highlights to create depth. Toy-like and clean, with a modern aesthetic and gentle ambient occlusion. No hard edges or photo textures.',
+  gradient:
+    'A modern flat icon silhouette with a vibrant, smooth gradient fill inside the shape. The gradient transitions seamlessly between multiple given colors, from warm to cool tones. The icon is a clean, minimalist silhouette with no outlines or internal details. The background is pure white (#FFFFFF), flat and uniform, with no gradients, textures, or extra elements. The gradient must only appear inside the icon, never in the background.',
+};
+
 const MODEL_ID = 'black-forest-labs/flux-schnell';
 
 export async function generateIcons(
@@ -65,16 +81,18 @@ function buildIconPrompt(
   colorPolicy: string,
 ): string {
   return [
-    `A centered image of ${subject} ${styleInstruction}`,
+    `A centered image of ${subject} with the following styles.`,
+    styleInstruction,
     colorPolicy,
-    'crisp edges, isolated on plain white background',
-    'no borders beyond icon shape, no watermark, no text',
   ].join(', ');
 }
 
 function buildStyleInstruction(style: string): string {
-  const normalizedStyle = style.trim().toLowerCase();
-  return normalizedStyle === 'auto' ? '' : `in a ${normalizedStyle} style`;
+  const key = (style ?? '').trim().toLowerCase();
+  const instruction = STYLE_PROMPTS[key];
+  if (instruction !== undefined) return instruction;
+  // Fallback for unknown styles
+  return key === 'auto' || key === '' ? '' : `in a ${key} style`;
 }
 
 /**
